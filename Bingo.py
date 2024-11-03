@@ -8,6 +8,9 @@ bingo_thread = None  # This will hold the Bingo board thread instance
 box_size = 150  # Set box size to be consistent and large
 window_size = 800  # Increase window size to fit the board
 board_size = 0
+board_color = "White"
+complete_color = "green"
+text_color = "Black"
 
 def create_bingo_board():
     global window
@@ -22,10 +25,10 @@ def create_bingo_board():
     window = tk.Tk()
     window.title("Bingo Board")
     window.geometry(f"{window_size}x{window_size}")  # Set the window size
-    window.configure(bg="White")  # Set the window background color to orange
+    window.configure(bg=board_color)  # Set the window background color to orange
 
     # Create a frame for the Bingo board
-    frame = tk.Frame(window, bg="White")  # Set frame background to match window
+    frame = tk.Frame(window, bg=board_color)  # Set frame background to match window
     frame.pack(expand=True, fill=tk.BOTH, padx=20, pady=20)  # Expand frame to fill the window
 
     # Configure grid weights for dynamic resizing
@@ -37,8 +40,8 @@ def create_bingo_board():
         for i in range(board_size):
             for j in range(board_size):
                 square_name = f"{chr(65 + i)}{j + 1}"  # Create names like "A1", "A2", etc.
-                label = tk.Label(frame, text=square_name, width=10, height=5, font=("Helvetica", 8),
-                                 borderwidth=4, relief="groove", bg="White", wraplength=box_size - 40,
+                label = tk.Label(frame, text=square_name, width=10, height=5, fg=text_color, font=("Helvetica", 8),
+                                 borderwidth=4, relief="groove", bg=board_color, wraplength=box_size - 40,
                                  justify='center')  # Set label background to orange
                 label.grid(row=i, column=j, padx=10, pady=10, sticky='nsew')  # Adjust sticky for resizing
                 board_squares[square_name] = label  # Store each label in the dictionary
@@ -72,9 +75,9 @@ def update_bingo_board(new_labels):
         board_squares[square_name].config(text=label_text)  # Update the text of the label
 
 def highlight_square(square_name):
-    # Highlight a specific square in green
+    # Highlight a specific square in the desired completion color
     if square_name in board_squares:
-        board_squares[square_name].config(bg="green")
+        board_squares[square_name].config(bg=complete_color)
     else:
         print(f"Square '{square_name}' not found on the board.")
 
