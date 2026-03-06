@@ -33,7 +33,7 @@ class BingoWorld(World):
     item_name_to_id = item_table
     board_locations = []
     board_size = 0
-    required_bingos = 22
+    required_bingos = 54
 
     def create_item(self, name: str) -> BingoItem:
         return BingoItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
@@ -128,7 +128,7 @@ class BingoWorld(World):
                 break
 
     def get_available_items(self):
-        return [f"{chr(row)}{col}" for row in range(ord('A'), ord('A') + self.options.board_size.value) for col in range(1, self.options.board_size.value + 1)]
+        return [f"{chr(col)}{row}" for col in range(ord('A'), ord('A') + self.options.board_size.value) for row in range(1, self.options.board_size.value + 1)]
 
     def get_available_locations(self, include_all):
 
@@ -142,21 +142,21 @@ class BingoWorld(World):
 
         suffix = 0  # Start with suffix 0
         while len(bingo_names) < required_locations:
-            # Generate horizontal Bingo names for the current suffix
-            for row in range(ord('A'), ord('A') + self.board_size):
-                if len(bingo_names) < required_locations:  # Check before appending
-                    bingo_names.append(f"Bingo ({chr(row)}1-{chr(row)}{self.board_size})-{suffix}")
-
             # Generate vertical Bingo names for the current suffix
-            for col in range(1, self.board_size + 1):
+            for col in range(ord('A'), ord('A') + self.board_size):
                 if len(bingo_names) < required_locations:  # Check before appending
-                    bingo_names.append(f"Bingo (A{col}-{chr(ord('A') + self.board_size - 1)}{col})-{suffix}")
+                    bingo_names.append(f"Bingo ({chr(col)}1-{chr(col)}{self.board_size})-{suffix}")
+
+            # Generate horizontal Bingo names for the current suffix
+            for row in range(1, self.board_size + 1):
+                if len(bingo_names) < required_locations:  # Check before appending
+                    bingo_names.append(f"Bingo (A{row}-{chr(ord('A') + self.board_size - 1)}{row})-{suffix}")
 
             # Generate diagonal Bingo names for the current suffix
             if len(bingo_names) < required_locations:  # Check before appending
                 bingo_names.append(f"Bingo (A1-{chr(ord('A') + self.board_size - 1)}{self.board_size})-{suffix}")
             if len(bingo_names) < required_locations:  # Check before appending
-                bingo_names.append(f"Bingo ({chr(ord('A') + self.board_size - 1)}1-A{self.board_size})-{suffix}")
+                bingo_names.append(f"Bingo (A{self.board_size}-{chr(ord('A') + self.board_size - 1)}1)-{suffix}")
 
             suffix += 1  # Increment suffix for the next round
 

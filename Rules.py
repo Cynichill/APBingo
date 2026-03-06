@@ -14,20 +14,20 @@ def special_rule(world, all_keys) -> Callable[[CollectionState], bool]:
 def can_goal(state, player, required_bingos, board_size) -> bool:
 
     # Generate all possible Bingo keys for the board
-    possible_keys = [f"{chr(row)}{col}" for row in range(ord('A'), ord('A') + board_size) for col in range(1, board_size + 1)]
+    possible_keys = [f"{chr(col)}{row}" for col in range(ord('A'), ord('A') + board_size) for row in range(1, board_size + 1)]
 
     possible_bingos = []
 
     # Generate rows
     possible_bingos += [
-        [f"{chr(ord('A') + row)}{col}" for col in range(1, board_size + 1)]
-        for row in range(board_size)
+        [f"{chr(ord('A') + row)}{col}" for row in range(board_size)]
+        for col in range(1, board_size + 1)
     ]
 
     # Generate columns
     possible_bingos += [
-        [f"{chr(ord('A') + row)}{col}" for row in range(board_size)]
-        for col in range(1, board_size + 1)
+        [f"{chr(ord('A') + row)}{col}" for col in range(1, board_size + 1)]
+        for row in range(board_size)
     ]
 
     # Generate the main diagonal (\) from top-left to bottom-right
@@ -61,26 +61,26 @@ def extract_bingo_spaces(location):
     start, end = location[location.index("(") + 1:location.index(")")].split("-")
 
     # Determine the range of rows and columns
-    start_row = start[0]  # 'A', 'B', 'C', etc.
-    start_col = int(start[1:])  # 1, 2, 3, etc.
-    end_row = end[0]  # 'A', 'B', 'C', etc.
-    end_col = int(end[1:])  # 1, 2, 3, etc.
+    start_col = start[0]  # 'A', 'B', 'C', etc.
+    start_row = int(start[1:])  # 1, 2, 3, etc.
+    end_col = end[0]  # 'A', 'B', 'C', etc.
+    end_row = int(end[1:])  # 1, 2, 3, etc.
 
     spaces = []
 
     # Generate spaces for horizontal or vertical Bingo
     if start_row == end_row:  # Horizontal Bingo
-        col_range = range(start_col, end_col + 1) if start_col < end_col else range(start_col, end_col - 1, -1)
+        col_range = range(ord(start_col), ord(end_col) + 1) if ord(start_col) < ord(end_col) else range(ord(start_col), ord(end_col) - 1, -1)
         for col in col_range:
-            spaces.append(f"{start_row}{col}")
+            spaces.append(f"{chr(col)}{start_row}")
     elif start_col == end_col:  # Vertical Bingo
-        row_range = range(ord(start_row), ord(end_row) + 1) if ord(start_row) < ord(end_row) else range(ord(start_row), ord(end_row) - 1, -1)
+        row_range = range(start_row, end_row + 1) if start_row < end_row else range(start_row, end_row - 1, -1)
         for row in row_range:
-            spaces.append(f"{chr(row)}{start_col}")
+            spaces.append(f"{start_col}{row}")
     else:  # Diagonal Bingo
-        row_range = range(ord(start_row), ord(end_row) + 1) if ord(start_row) < ord(end_row) else range(ord(start_row), ord(end_row) - 1, -1)
-        col_range = range(start_col, end_col + 1) if start_col < end_col else range(start_col, end_col - 1, -1)
-        for row, col in zip(row_range, col_range):
-            spaces.append(f"{chr(row)}{col}")
+        col_range = range(ord(start_col), ord(end_col) + 1) if ord(start_col) < ord(end_col) else range(ord(start_col), ord(end_col) - 1, -1)
+        row_range = range(start_row, end_row + 1) if start_row < end_row else range(start_row, end_row - 1, -1)
+        for col, row in zip(col_range, row_range):
+            spaces.append(f"{chr(col)}{row}")
 
     return spaces
