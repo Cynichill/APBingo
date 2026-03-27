@@ -9,7 +9,6 @@ class RequiredBingos(Range):
     default = 1
     display_name = "Required Bingos"
 
-
 class BoardSize(Range):
     """The size of the bingo board (3 = 3x3, 10 = 10x10)"""
     range_start = 3
@@ -25,32 +24,12 @@ class BingoBalancing(Range):
     display_name = "Bingo Forced Balancing"
 
 class AutoHints(Toggle):
-    """If true, automatically hint all board squares"""
+    """If true, automatically hint all board squares. If combined with Fog of war, hints revealed squares."""
     display_name = "Auto Hints"
 
-
-class CustomBoardColor(TextChoice):
-    """Choose the background Color (Use colors or Hex)"""
-    display_name = "Background Color"
-    default = "White"
-
-
-class CustomSquareColor(TextChoice):
-    """Choose the Square Color (Use colors or Hex)"""
-    display_name = "Square Color"
-    default = "White"
-
-
-class CustomHLSquareColor(TextChoice):
-    """Choose the Highlighted Square Color (Use colors or Hex)"""
-    display_name = "Highlighted Square Color"
-    default = "Green"
-
-
-class CustomTextColor(TextChoice):
-    """Choose the Text Color (Use colors or Hex)"""
-    display_name = "Text Color"
-    default = "Black"
+class FogOfWar(Toggle):
+    """Initially hide all but one square, reveal information of adjacent squares when a square is found"""
+    display_name = "Fog Of War"
 
 class BingoStartHints(StartHints):
     """Start with these item's locations prefilled into the ``!hint`` command."""
@@ -62,8 +41,5 @@ class BingoOptions(PerGameCommonOptions):
     board_size: BoardSize
     bingo_balance: BingoBalancing
     auto_hints: AutoHints
-    board_color: CustomBoardColor
-    square_color: CustomSquareColor
-    hl_square_color: CustomHLSquareColor
-    text_color: CustomTextColor
     start_hints: BingoStartHints
+    fog_of_war: FogOfWar

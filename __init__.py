@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 
-from BaseClasses import Region, Item, ItemClassification, Entrance, Tutorial, MultiWorld
+from BaseClasses import Region, Item, ItemClassification, Entrance, Tutorial, MultiWorld, Location
 from worlds.AutoWorld import World
 from worlds.LauncherComponents import Component, components, Type, launch_subprocess
 from .Items import BingoItem, item_data_table, item_table
@@ -8,7 +8,7 @@ from .Locations import BingoLocation, location_data_table, location_table
 from .Options import BingoOptions, BingoStartHints
 from .Regions import region_data_table
 from .Rules import get_bingo_rule, special_rule, can_goal
-
+import random
 
 def launch_client():
     from .Client import launch
@@ -34,6 +34,8 @@ class BingoWorld(World):
     board_locations = []
     board_size = 0
     required_bingos = 54
+    random_square = ""
+    hint_data = []
 
     def create_item(self, name: str) -> BingoItem:
         return BingoItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
@@ -175,18 +177,29 @@ class BingoWorld(World):
             board_location = self.multiworld.find_item(square, self.player)
             self.board_locations.append(str(board_location))
 
+        if bool(self.options.fog_of_war):
+            self.random_square = str(random.choice(squares))
+            self.generate_hint_data()
+
+    def generate_hint_data(self):
+
+        for item in self.get_available_items():
+            for scout in self.multiworld.find_item_locations(item, self.player):
+                self.hint_data.append({"itemName": item, "name": scout.name, "id": scout.address, "player": scout.player})
+
     def fill_slot_data(self) -> Dict[str, Any]:
 
         self.find_locations()
-        if bool(self.options.auto_hints):
+        if bool(self.options.auto_hints) and not bool(self.options.fog_of_war):
             self.options.start_hints = BingoStartHints(self.get_available_items())
+
 
         return {
             "requiredBingoCount": self.required_bingos,
             "boardLocations": self.board_locations,
             "boardSize": self.options.board_size.value,
-            "customBoard": str(self.options.board_color.value),
-            "customSquare": str(self.options.square_color.value),
-            "customHLSquare": str(self.options.hl_square_color.value),
-            "customText": str(self.options.text_color.value),
+            "fogOfWar": bool(self.options.fog_of_war),
+            "autoHints": bool(self.options.auto_hints),
+            "startSquare": self.random_square,
+            "hintData": self.hint_data,
         }
