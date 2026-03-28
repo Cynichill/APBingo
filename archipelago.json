@@ -1,6 +1,1 @@
-{
-    "game": "APBingo",
-    "minimum_ap_version": "0.6.6",
-    "world_version": "1.0.0",
-    "authors": ["Cynichill"]
-}
+{"game": "APBingo", "minimum_ap_version": "0.6.6", "world_version": "1.0.0", "authors": ["Cynichill"], "compatible_version": 7, "version": 7}
