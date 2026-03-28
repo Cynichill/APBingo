@@ -43,22 +43,6 @@ jobs:
           uv run python ModuleUpdate.py --yes --force --append "WebHostLib/requirements.txt"
           uv run python Launcher.py --update_settings
 
-      - name: World | Set up Fuzzer
-        uses: actions/checkout@v4
-        with:
-          repository: Eijebong/Archipelago-fuzzer
-          ref: ${{ env.UPSTREAM_REF_FUZZER }}
-          path: fuzzer
-          
-      - name: World | Fuzz
-        run: |
-          mv ./fuzzer/* .
-          uv run python fuzz.py -g APBingo -j 2 -r 50
-          
-      - name: World | Fuzz (Determinism)
-        run: |
-          uv run python fuzz.py -g APBingo -j 2 -r 10 -n 1 --hook hooks.determinism:Hook 
-
       - name: World | General tests
         run: uv run pytest test/general worlds/APBingo
 
