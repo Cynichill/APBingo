@@ -52,7 +52,7 @@ jobs:
             uv run python Launcher.py "Generate Template Options"
             cp "./Players/Templates/APBingo.yaml" .
             AP_VER=$(jq -r '.minimum_ap_version' worlds/APBingo/archipelago.json)
-            sed -Ei "s/(\s+version: )[0-9\.]+/\1$AP_VER/" "APBingo"
+            sed -Ei "s/(\s+version: )[0-9\.]+/\1$AP_VER/" "APBingo.yaml"
             
       - name: Archipelago | Update archipelago.json
         run: |

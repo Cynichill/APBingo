@@ -3,7 +3,7 @@ import json
 
 from worlds.Files import APWorldContainer
 
-manifest_path = "worlds/megamix/archipelago.json"
+manifest_path = "worlds/APBingo/archipelago.json"
 APWC = APWorldContainer()
 
 manifest = {}
