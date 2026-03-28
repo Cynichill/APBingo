@@ -26,7 +26,7 @@ for size in range(min_size, max_size + 1):
     for col in cols:
         location_data_table.update({
             f"Bingo ({col}1-{col}{size})-{i}": BingoLocationData(region="Bingo Board", address=address + i)
-            for i in range(5)
+            for i in range(13)
         })
         address += 5
 
@@ -34,21 +34,21 @@ for size in range(min_size, max_size + 1):
     for row in rows:
         location_data_table.update({
             f"Bingo (A{row}-{cols[-1]}{row})-{i}": BingoLocationData(region="Bingo Board", address=address + i)
-            for i in range(5)
+            for i in range(13)
         })
         address += 5
 
     # Generate main diagonal entries (e.g., "Bingo (A1-C3)-0" and "Bingo (A1-C3)-1" for 3x3)
     location_data_table.update({
         f"Bingo (A1-{cols[-1]}{rows[-1]})-{i}": BingoLocationData(region="Bingo Board", address=address + i)
-        for i in range(5)
+        for i in range(13)
     })
     address += 5
 
     # Generate anti-diagonal entries (e.g., "Bingo (A3-C1)-0" and "Bingo (A3-C1)-1" for 3x3)
     location_data_table.update({
         f"Bingo (A{rows[-1]}-{cols[-1]}1)-{i}": BingoLocationData(region="Bingo Board", address=address + i)
-        for i in range(5)
+        for i in range(13)
     })
     address += 5
 
