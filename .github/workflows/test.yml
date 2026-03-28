@@ -1,0 +1,88 @@
+name: tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      fuzzer_run:
+        description: 'Create a new APWorld release'
+        type: boolean
+        required: true
+        default: false
+  schedule:
+    - cron: "0 0 * * 0"
+
+env:
+  UPSTREAM_REF_FUZZER: '0.5.1'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ArchipelagoMW/Archipelago
+      - uses: actions/checkout@v4
+        with:
+          path: worlds/megamix
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          python-version: 3.12
+          enable-cache: true
+
+      - name: Archipelago | Setup
+        run: |
+          find ./worlds -mindepth 1 -maxdepth 1 -type d -regextype posix-extended ! -regex '.*/(APBingo|generic|alttp|apquest)' -exec rm -rf {} \;
+          uv venv
+          uv pip install pip pytest pytest-subtests pytest-xdist
+          find -name requirements.txt | xargs -n1 uv pip install -r
+          #uv run cythonize -a -i _speedups.pyx # 3.11-
+          uv run python ModuleUpdate.py --yes --force --append "WebHostLib/requirements.txt"
+          uv run python Launcher.py --update_settings
+
+      - name: World | Set up Fuzzer
+        uses: actions/checkout@v4
+        with:
+          repository: Eijebong/Archipelago-fuzzer
+          ref: ${{ env.UPSTREAM_REF_FUZZER }}
+          path: fuzzer
+          
+      - name: World | Fuzz
+        run: |
+          mv ./fuzzer/* .
+          uv run python fuzz.py -g APBingo -j 2 -r 50
+          
+      - name: World | Fuzz (Determinism)
+        run: |
+          uv run python fuzz.py -g APBingo -j 2 -r 10 -n 1 --hook hooks.determinism:Hook 
+
+      - name: World | General tests
+        run: uv run pytest test/general worlds/APBingo
+
+      - name: Archipelago | Generate template
+        run: |
+            uv run python Launcher.py "Generate Template Options"
+            cp "./Players/Templates/APBingo.yaml" .
+            AP_VER=$(jq -r '.minimum_ap_version' worlds/APBingo/archipelago.json)
+            sed -Ei "s/(\s+version: )[0-9\.]+/\1$AP_VER/" "APBingo"
+            
+      - name: Archipelago | Update archipelago.json
+        run: |
+            PYTHONPATH=. uv run python worlds/megamix/.github/workflows/manifest.py
+
+      - name: World | Zip
+        run: |
+          rm -rf worlds/APBingo/.git* worlds/APBingo/*.yaml worlds/APBingo/.idea worlds/APBingo/sorted_mod_pv_db.txt
+          find worlds/APBingo/ -type d -iname '__pycache__' -exec rm -r {} +
+          7z a -tzip -mm=deflate -mfb=256 -mx9 -mtc- -mta- -mtm- APBingo.apworld ./worlds/APBingo/
+
+      - name: World | Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-apworld
+          path: |
+            APBingo.apworld
+            APBingo+.yaml
