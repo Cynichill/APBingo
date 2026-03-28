@@ -24,7 +24,7 @@ jobs:
           repository: ArchipelagoMW/Archipelago
       - uses: actions/checkout@v4
         with:
-          path: worlds/megamix
+          path: worlds/APBingo
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
@@ -71,7 +71,7 @@ jobs:
             
       - name: Archipelago | Update archipelago.json
         run: |
-            PYTHONPATH=. uv run python worlds/megamix/.github/workflows/manifest.py
+            PYTHONPATH=. uv run python worlds/APBingo/.github/workflows/manifest.py
 
       - name: World | Zip
         run: |
