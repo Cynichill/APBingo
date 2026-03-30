@@ -7,13 +7,12 @@ from .Items import BingoItem, item_data_table, item_table
 from .Locations import BingoLocation, location_data_table, location_table
 from .Options import BingoOptions, BingoStartHints
 from .Regions import region_data_table
-from .Rules import get_bingo_rule, special_rule, can_goal
+from .Rules import get_bingo_rule, special_rules, can_goal
 import random
 
 def launch_client():
     from .Client import launch
     launch_subprocess(launch, name="APBingoClient")
-
 
 components.append(Component(
     "APBingo Client",
@@ -21,7 +20,6 @@ components.append(Component(
     func=launch_client,
     component_type=Type.CLIENT
 ))
-
 
 class BingoWorld(World):
     """Randomized Bingo!"""
@@ -33,7 +31,7 @@ class BingoWorld(World):
     item_name_to_id = item_table
     board_locations = []
     board_size = 0
-    required_bingos = 54
+    required_bingos = 59
     random_square = ""
     hint_data = []
 
@@ -48,6 +46,7 @@ class BingoWorld(World):
         for name, item in item_data_table.items():
             if name in squares:
                 item_pool.append(self.create_item(name))
+
         self.options.non_local_items.value = set(squares)
         self.multiworld.itempool += item_pool
 
@@ -80,17 +79,19 @@ class BingoWorld(World):
             self.get_location(bingo).item_rule = lambda item: item.game != "APBingo"
 
         all_keys = self.get_available_items()
-        self.get_location("Bingo (ALL)").access_rule = special_rule(self, all_keys)
-        self.get_location("Bingo (ALL)").item_rule = lambda item: item.game != "APBingo"
+
+        for special in self.options.additional_bingos.value:
+            self.get_location("Bingo (" + special + ")").access_rule = special_rules(self, all_keys, special)
+            self.get_location("Bingo (" + special + ")").item_rule = lambda item: item.game != "APBingo"
 
         # Don't allow incorrect values for required bingos
         self.required_bingos = self.options.required_bingos.value
-        max_possible_bingos = (2 * self.board_size + 2)
+        max_possible_bingos = (2 * self.board_size + 2) + len(self.options.additional_bingos.value)
         if self.required_bingos > max_possible_bingos:
             self.required_bingos = max_possible_bingos
 
         # Completion condition.
-        self.multiworld.completion_condition[self.player] = lambda state: can_goal(state, self.player, self.required_bingos, self.board_size)
+        self.multiworld.completion_condition[self.player] = lambda state: can_goal(state, self.player, self.required_bingos, self.board_size, self.options.additional_bingos.value)
 
     def pre_fill(self) -> None:
         if self.options.bingo_balance == 0:
@@ -132,7 +133,7 @@ class BingoWorld(World):
     def get_available_items(self):
         return [f"{chr(col)}{row}" for col in range(ord('A'), ord('A') + self.options.board_size.value) for row in range(1, self.options.board_size.value + 1)]
 
-    def get_available_locations(self, include_all):
+    def get_available_locations(self, include_additional):
 
         # Define the board size
         self.board_size = self.options.board_size.value  # Change this to any integer for different board sizes
@@ -140,7 +141,7 @@ class BingoWorld(World):
         bingo_names = []
 
         # Required locations should match the board size
-        required_locations = (self.board_size * self.board_size) - 1
+        required_locations = (self.board_size * self.board_size) - len(self.options.additional_bingos.value)
 
         suffix = 0  # Start with suffix 0
         while len(bingo_names) < required_locations:
@@ -162,9 +163,10 @@ class BingoWorld(World):
 
             suffix += 1  # Increment suffix for the next round
 
-        # Include the ALL bingo if specified and we haven't filled the required locations
-        if include_all:
-            bingo_names.append("Bingo (ALL)")
+        # Include the additional bingos if specified and we haven't filled the required locations
+        if include_additional:
+            for bingo in self.options.additional_bingos.value:
+                bingo_names.append("Bingo (" + bingo + ")")
 
         return bingo_names
 
@@ -193,7 +195,6 @@ class BingoWorld(World):
         if bool(self.options.auto_hints) and not bool(self.options.fog_of_war):
             self.options.start_hints = BingoStartHints(self.get_available_items())
 
-
         return {
             "requiredBingoCount": self.required_bingos,
             "boardLocations": self.board_locations,
@@ -202,4 +203,5 @@ class BingoWorld(World):
             "autoHints": bool(self.options.auto_hints),
             "startSquare": self.random_square,
             "hintData": self.hint_data,
+            "additionalBingos": self.options.additional_bingos.value,
         }
