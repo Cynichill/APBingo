@@ -10,17 +10,6 @@ from .Regions import region_data_table
 from .Rules import get_bingo_rule, special_rules, can_goal
 import random
 
-def launch_client():
-    from .Client import launch
-    launch_subprocess(launch, name="APBingoClient")
-
-components.append(Component(
-    "APBingo Client",
-    "APBingoClient",
-    func=launch_client,
-    component_type=Type.CLIENT
-))
-
 class BingoWorld(World):
     """Randomized Bingo!"""
 
