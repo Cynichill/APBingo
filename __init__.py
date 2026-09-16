@@ -18,11 +18,14 @@ class BingoWorld(World):
     options_dataclass = BingoOptions
     location_name_to_id = location_table
     item_name_to_id = item_table
-    board_locations = []
-    board_size = 0
-    required_bingos = 59
-    random_square = ""
-    hint_data = []
+
+    def __init__(self, multiworld: MultiWorld, player: int):
+        self.board_locations = []
+        self.board_size = 0
+        self.random_square = ""
+        self.required_bingos = 59
+        self.hint_data = []
+        super().__init__(multiworld, player)
 
     def create_item(self, name: str) -> BingoItem:
         return BingoItem(name, item_data_table[name].type, item_data_table[name].code, self.player)
