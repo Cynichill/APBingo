@@ -195,3 +195,24 @@ def extract_bingo_spaces(location):
             spaces.append(f"{chr(col)}{row}")
 
     return spaces
+
+def free_square_rules(world) -> None:
+    free_items = {
+        f"Free Square: {chr(ord('A') + col)}{row}"
+        for col in range(world.board_size)
+        for row in range(1, world.board_size + 1)
+    }
+
+    minigame_locations = {
+        f"Minigame Reward #{i}"
+        for i in range(1, world.board_size ** 2 + 1)
+    }
+
+    for location in world.multiworld.get_locations(world.player):
+        if location.name in minigame_locations:
+            location.item_rule = lambda item: (
+                item.player == world.player
+                and item.name in free_items
+            )
+        else:
+            location.item_rule = lambda item: item.name not in free_items
