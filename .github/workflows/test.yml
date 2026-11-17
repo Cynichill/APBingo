@@ -33,13 +33,24 @@ jobs:
           python-version: 3.12
           enable-cache: true
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev pkg-config python3-dev
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          python-version: 3.12
+          enable-cache: true
+
       - name: Archipelago | Setup
         run: |
           find ./worlds -mindepth 1 -maxdepth 1 -type d -regextype posix-extended ! -regex '.*/(APBingo|generic|alttp|apquest)' -exec rm -rf {} \;
           uv venv
           uv pip install pip pytest pytest-subtests pytest-xdist
           find -name requirements.txt | xargs -n1 uv pip install -r
-          #uv run cythonize -a -i _speedups.pyx # 3.11-
           uv run python ModuleUpdate.py --yes --force --append "WebHostLib/requirements.txt"
           uv run python Launcher.py --update_settings
 
