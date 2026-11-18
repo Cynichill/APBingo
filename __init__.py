@@ -215,5 +215,6 @@ class BingoWorld(World):
             "startSquare": self.random_square,
             "hintData": self.hint_data,
             "additionalBingos": self.options.additional_bingos.value,
-            "minigameMania": bool(self.options.add_minigames)
+            "minigameMania": bool(self.options.add_minigames),
+            "deathLink": bool(self.options.death_link)
         }

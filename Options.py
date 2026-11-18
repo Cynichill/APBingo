@@ -41,13 +41,17 @@ class FogOfWar(Toggle):
     """Initially hide all but one square, reveal information of adjacent squares when a square is found"""
     display_name = "Fog Of War"
 
+class BingoStartHints(StartHints):
+    """Start with these item's locations prefilled into the ``!hint`` command."""
+    default = []
+
 class AddMinigames(Toggle):
     """Adds Minigames available every 10 minutes, beating one awards a random square for free! Does not change logic."""
     display_name = "Minigame Mania"
 
-class BingoStartHints(StartHints):
-    """Start with these item's locations prefilled into the ``!hint`` command."""
-    default = []
+class DeathLink(Toggle):
+    """Sends a death link when losing a minigame when the reward is available."""
+    display_name = "Death Link"
 
 @dataclass
 class BingoOptions(PerGameCommonOptions):
@@ -59,3 +63,4 @@ class BingoOptions(PerGameCommonOptions):
     start_hints: BingoStartHints
     fog_of_war: FogOfWar
     add_minigames: AddMinigames
+    death_link: DeathLink
