@@ -66,11 +66,5 @@ for pattern in bingo_patterns:
     location_data_table[pattern] = BingoLocationData(region="Bingo Board", address=address)
     address += 1
 
-minigame_reward_count = 26 * 26
-
-for i in range(1, minigame_reward_count + 1):
-    location_data_table[f"Minigame Reward #{i}"] = BingoLocationData(region="Bingo Board", address=address)
-    address += 1
-
 # Create the final dictionary with address-only values
 location_table = {name: data.address for name, data in location_data_table.items() if data.address is not None}

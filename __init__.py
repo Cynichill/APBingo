@@ -7,7 +7,7 @@ from .Items import BingoItem, item_data_table, item_table
 from .Locations import BingoLocation, location_data_table, location_table
 from .Options import BingoOptions, BingoStartHints
 from .Regions import region_data_table
-from .Rules import get_bingo_rule, special_rules, can_goal, free_hint_rules
+from .Rules import get_bingo_rule, special_rules, can_goal
 import random
 
 class BingoWorld(World):
@@ -39,15 +39,6 @@ class BingoWorld(World):
         for name, item in item_data_table.items():
             if name in squares:
                 item_pool.append(self.create_item(name))
-
-        # Add 'Free' hints if minigames are on
-        if self.options.add_minigames:
-            free_hints = [f"Free Location Hint #{i}" for i in range(1, self.options.board_size ** 2 + 1)]
-
-            for free_hint in free_hints:
-                item_pool.append(self.create_item(free_hint))
-
-            self.options.local_items.value |= set(free_hints)
 
         self.options.non_local_items.value = set(squares)
         self.multiworld.itempool += item_pool
@@ -97,9 +88,6 @@ class BingoWorld(World):
         max_possible_bingos = (2 * self.board_size + 2) + len(self.options.additional_bingos.value)
         if self.required_bingos > max_possible_bingos:
             self.required_bingos = max_possible_bingos
-
-        # Free hint placement rules
-        free_hint_rules(self)
 
         # Completion condition.
         self.multiworld.completion_condition[self.player] = lambda state: can_goal(state, self.player, self.required_bingos, self.board_size, self.options.additional_bingos.value)
