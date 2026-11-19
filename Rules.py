@@ -21,7 +21,7 @@ def special_rules(world, all_keys, bingo) -> Callable[[CollectionState], bool]:
                 f"{r}{c}"
                 for i, r in enumerate(rows)
                 for j, c in enumerate(cols)
-                if (i + j) % 2 == 0  # "every second square" pattern
+                if (i + j) % 2 == 0  # every other square, starting from first
             ]
 
             return lambda state: all(state.has(key, world.player) for key in checkerboard_keys)
