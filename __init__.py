@@ -55,12 +55,6 @@ class BingoWorld(World):
 
             available_locs = self.get_available_locations(True)
 
-            if self.options.add_minigames:
-                available_locs.extend(
-                    f"Minigame Reward #{i}"
-                    for i in range(1, self.board_size ** 2 + 1)
-                )
-
             filtered_locations = {
                 location: data.address
                 for location, data in location_data_table.items()
